@@ -234,7 +234,9 @@ module ArJdbc
         elsif ! column.respond_to?(:is_utf8?) || column.is_utf8?
           "N'#{quote_string(value)}'" # ' (for ruby-mode)
         else
-          super
+          if value != 'null'
+            super
+          end
         end
       when Date, Time
         if column && column.type == :time
