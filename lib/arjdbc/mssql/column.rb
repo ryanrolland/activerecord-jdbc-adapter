@@ -56,6 +56,7 @@ module ArJdbc
         when :time      then self.class.string_to_dummy_time(value)
         when :boolean   then value == true || (value =~ /^t(rue)?$/i) == 0 || unquote(value) == '1'
         when :binary    then unquote(value)
+        when :string then (value == 'null' ? '' : value)
         else value
         end
       end
