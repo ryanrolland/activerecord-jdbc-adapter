@@ -236,6 +236,8 @@ module ArJdbc
         else
           if value != 'null'
             super
+          else
+            value.to_s
           end
         end
       when Date, Time
