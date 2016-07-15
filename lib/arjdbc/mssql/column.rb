@@ -122,19 +122,26 @@ module ArJdbc
           return value unless value.is_a?(String)
           return nil if value.empty?
 
-          date = fast_string_to_date(value)
-          date ? date : Date.parse(value) rescue nil
+          if value.include? "/"
+            date = Date.strptime(value, "%m/%d/%Y")
+          else
+            date = fast_string_to_date(value)
+            date ? date : Date.parse(value) rescue nil
+          end
+
         end
 
         def string_to_time(value)
           return value unless value.is_a?(String)
           return nil if value.empty?
 
-          result = fast_string_to_time(value) rescue nil
-
-          if result.nil?
-            result = DateTime.parse(value).to_time rescue nil
+          if value.include? "/"
+            result = DateTime.strptime(value, "%m/%d/%Y")
+          else
+            result = fast_string_to_time(value) || DateTime.parse(value).to_time rescue nil
           end
+
+
           result
         end
 
