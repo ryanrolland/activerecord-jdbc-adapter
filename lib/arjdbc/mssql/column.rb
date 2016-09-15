@@ -138,8 +138,12 @@ module ArJdbc
 
           if value.include? "/"
             result = DateTime.strptime(value+' '+Time.now.zone, "%m/%d/%Y %Z")
+          elsif value =~ ActiveRecord::ConnectionAdapters::Column::Format::ISO_DATE
+            result = DateTime.parse(value+'T00:00:00'+Time.now.formatted_offset)
+          elsif value =~ ActiveRecord::ConnectionAdapters::Column::Format::ISO_DATETIME
+            result = fast_string_to_time(value)
           else
-            result = fast_string_to_time(value) || DateTime.parse(value).to_time rescue nil
+            result = DateTime.parse(value).to_time rescue nil
           end
 
           result
