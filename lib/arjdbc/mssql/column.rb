@@ -56,7 +56,8 @@ module ArJdbc
         when :time      then self.class.string_to_dummy_time(value)
         when :boolean   then value == true || (value =~ /^t(rue)?$/i) == 0 || unquote(value) == '1'
         when :binary    then unquote(value)
-        when :string then (value == 'null' ? '' : value)
+        when :string    then (value == 'null' ? '' : value)
+        when :text      then (value == 'null' ? '' : value)
         else value
         end
       end
@@ -136,11 +137,10 @@ module ArJdbc
           return nil if value.empty?
 
           if value.include? "/"
-            result = DateTime.strptime(value, "%m/%d/%Y")
+            result = DateTime.strptime(value+' '+Time.now.zone, "%m/%d/%Y %Z")
           else
             result = fast_string_to_time(value) || DateTime.parse(value).to_time rescue nil
           end
-
 
           result
         end
