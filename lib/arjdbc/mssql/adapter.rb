@@ -234,7 +234,7 @@ module ArJdbc
         elsif ! column.respond_to?(:is_utf8?) || column.is_utf8?
           "N'#{quote_string(value)}'" # ' (for ruby-mode)
         else
-          if value != 'null'
+          if value.to_s.downcase != 'null'
             super
           else
             value.to_s
