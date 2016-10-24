@@ -10,15 +10,19 @@ module Arel
         def do_visit(x, a); visit(x, a); end
       end
 
-      if ToSql.instance_method('visit_Arel_Nodes_SelectCore').arity == 1
+      # We need to force the downgrade of the api here (commented conditional below)because of patch to make
+      # TOP work instead of LIMIT for MSSQL support. When moving to a newer version of rails and arel this change
+      # should be reverted if TOP support is included else a similar change will need to be done on that new version
+      # as well.
+      # if ToSql.instance_method('visit_Arel_Nodes_SelectCore').arity == 1
         def do_visit_select_core(x, a) # a = nil
           visit_Arel_Nodes_SelectCore(x)
         end
-      else # > AREL 4.0
-        def do_visit_select_core(x, a)
-          visit_Arel_Nodes_SelectCore(x, a)
-        end
-      end
+      # else # > AREL 4.0
+      #   def do_visit_select_core(x, a)
+      #     visit_Arel_Nodes_SelectCore(x, a)
+      #   end
+      # end
 
       private
 
