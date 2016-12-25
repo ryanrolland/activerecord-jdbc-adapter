@@ -143,9 +143,24 @@ module ArJdbc
           elsif value =~ ActiveRecord::ConnectionAdapters::Column::Format::ISO_DATETIME
             result = fast_string_to_time(value)
           else
-            result = DateTime.parse(value).to_time rescue nil
+            #It looks like there is a bug in the datetime string logic that lives upstream of this method
+            #getting called. The fractional seconds are getting thrown out of values stored in the db such
+            #as:
+            #2016-12-24 11:09:43.097 (by examination in db visualizer)
+            #which end up as (by the time the value gets to this method):
+            #2016-12-24 11:09:43.
+            #without the zero the ISO_DATETIME format check fails and we are getting conversion done
+            #by the DateTime.parse which ignores timezone. This ends up returning dates erroneously.
+            #It is tempting to make the else condition below raise an exception because we really don't
+            #want timezone to be ignored in any situation. My level of confidence is not high enough to
+            #change now.
+            check_missing_zero = value + '0'
+            if check_missing_zero =~ ActiveRecord::ConnectionAdapters::Column::Format::ISO_DATETIME
+              result = fast_string_to_time(check_missing_zero)
+            else
+              result = DateTime.parse(value).to_time rescue nil
+            end
           end
-
           result
         end
 
